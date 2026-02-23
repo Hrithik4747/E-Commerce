@@ -32,7 +32,8 @@ mongoose
 
 app.use(
   cors({
-    origin: "http://localhost:5173", // frontend dev server (Vite/React)
+    origin: "
+e-commerce-1n95-git-main-hrithik-raushans-projects.vercel.app", // frontend dev server (Vite/React)
     methods: ["GET", "POST", "DELETE", "PUT"],
     allowedHeaders: [
       "Content-Type",
