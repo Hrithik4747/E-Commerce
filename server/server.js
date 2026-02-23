@@ -21,34 +21,43 @@ const commonFeatureRouter = require("./routes/common/feature-routes");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ✅ Connect to MongoDB using env variable
-console.log("🔍 MONGO_URI being used:", process.env.MONGO_URI); // 👈 Add this
-
+// ✅ MongoDB Connection
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))
   .catch((error) => console.error("❌ MongoDB connection error:", error));
 
 
+// ✅ Allowed Origins
+const allowedOrigins = [
+  "http://localhost:5173", // local dev
+  "https://e-commerce-1n95.vercel.app", // production frontend
+];
+
+// ✅ CORS Configuration
 app.use(
   cors({
-    origin: "e-commerce-1n95-git-main-hrithik-raushans-projects.vercel.app", // frontend dev server (Vite/React)
-    methods: ["GET", "POST", "DELETE", "PUT"],
-    allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-      "Cache-Control",
-      "Expires",
-      "Pragma",
-    ],
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.indexOf(origin) === -1) {
+        const msg = "CORS policy does not allow this origin.";
+        return callback(new Error(msg), false);
+      }
+
+      return callback(null, true);
+    },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
   })
 );
 
 app.use(cookieParser());
 app.use(express.json());
 
-// Routes
+
+// ================= ROUTES =================
+
 app.use("/api/auth", authRouter);
 app.use("/api/admin/products", adminProductsRouter);
 app.use("/api/admin/orders", adminOrderRouter);
@@ -62,4 +71,9 @@ app.use("/api/shop/review", shopReviewRouter);
 
 app.use("/api/common/feature", commonFeatureRouter);
 
-app.listen(PORT, () => console.log(`🚀 Server is running on port ${PORT}`));
+
+// ================= START SERVER =================
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server is running on port ${PORT}`);
+});
