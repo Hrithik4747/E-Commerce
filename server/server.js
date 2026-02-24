@@ -34,32 +34,27 @@ mongoose
 /* =========================
    CORS Configuration
 ========================= */
-
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (like Postman)
+      // Allow requests with no origin (like Postman or server-to-server)
       if (!origin) return callback(null, true);
 
       // Allow localhost
-      if (origin === "http://localhost:5173") {
-        return callback(null, true);
-      }
+      if (origin === "http://localhost:5173") return callback(null, true);
 
-      // Allow ALL vercel deployments (preview + production)
-      if (origin.includes("vercel.app")) {
-        return callback(null, true);
-      }
+      // Allow any Vercel deployment (preview + production)
+      if (origin.includes("vercel.app")) return callback(null, true);
 
       return callback(new Error("Not allowed by CORS"));
     },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,                 // Allow cookies
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], 
+    allowedHeaders: "*",               // Allow all headers (fixes Cache-Control issue)
   })
 );
 
-// Handle preflight requests
+// Handle preflight requests for all routes
 app.options("*", cors());
 
 /* =========================
