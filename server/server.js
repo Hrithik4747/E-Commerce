@@ -8,7 +8,6 @@ const cors = require("cors");
 const authRouter = require("./routes/auth/auth-routes");
 const adminProductsRouter = require("./routes/admin/products-routes");
 const adminOrderRouter = require("./routes/admin/order-routes");
-
 const shopProductsRouter = require("./routes/shop/products-routes");
 const shopCartRouter = require("./routes/shop/cart-routes");
 const shopAddressRouter = require("./routes/shop/address-routes");
@@ -37,24 +36,26 @@ mongoose
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (like Postman or server-to-server)
-      if (!origin) return callback(null, true);
+      if (!origin) return callback(null, true); // allow Postman or server-to-server
 
-      // Allow localhost
-      if (origin === "http://localhost:5173") return callback(null, true);
-
-      // Allow any Vercel deployment (preview + production)
-      if (origin.includes("vercel.app")) return callback(null, true);
+      if (origin === "http://localhost:5173" || origin.includes("vercel.app")) {
+        return callback(null, true);
+      }
 
       return callback(new Error("Not allowed by CORS"));
     },
-    credentials: true,                 // Allow cookies
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], 
-    allowedHeaders: "*",               // Allow all headers (fixes Cache-Control issue)
+    credentials: true, // allow cookies
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "Cache-Control",
+      "X-Requested-With"
+    ],
   })
 );
 
-// Handle preflight requests for all routes
+// Preflight requests
 app.options("*", cors());
 
 /* =========================
